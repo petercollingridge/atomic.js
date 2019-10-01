@@ -4,15 +4,18 @@ var Atomic = (function () {
 
     // Functions
     var random = Math.random;
+    var min = Math.min;
+    var max = Math.max;
+    var sqrt = Math.sqrt;
 
     // Default config
     var INITIAL_SPEED = 1;
     var PARTICLE_FILL = 'rgb(100, 120, 200)';
     var PARTICLE_R = 5;
+    var BOND_LIMIT = 18;
+    var BIN_SIZE = BOND_LIMIT;
 
-    function getParticle(x, y, r, colour) {
-        // Velocity
-        var speed = INITIAL_SPEED * random();
+    function getParticle(x, y, r, colour, speed) {
         var angle = TAU * random();
 
         return {
@@ -42,22 +45,75 @@ var Atomic = (function () {
         var nParticles = 0;
         var animationId;
 
-        // World config
+        var binRows, binCols, nBins;
+
+        // Initial world config
         var config = {
             particleFill: PARTICLE_FILL,
             particleR: PARTICLE_R,
-        }
+            initialSpeed: INITIAL_SPEED,
+            bondLimit: BOND_LIMIT,
+        };
+        _setBinSize(BIN_SIZE);
 
-        function addParticles(n) {
+        function _addParticles(positions, params) {
+            if (!params) { params = {}; }
+            
+            var r = params.r || config.particleR;
+            var colour = params.colour || config.particleFill;
+            var maxSpeed = params.speed || config.initialSpeed;
+            
+            var n = positions.length;
             for (var i = 0; i < n; i++) {
-                var x = width * random();
-                var y = height * random();
-                var r = config.particleR;
-                var colour = config.particleFill;
-                particles.push(getParticle(x, y, r, colour));
+                var x = positions[i][0];
+                var y = positions[i][1];
+                var speed = random() * maxSpeed;
+                particles.push(getParticle(x, y, r, colour, speed));
             }
+
             nParticles += n;
         };
+
+        function addParticles(n, params) {
+            // Generate random positions
+            var positions = [];
+            for (var i = 0; i < n; i++) {
+                positions.push([width * random(), height * random()]);
+            }
+            _addParticles(positions, params);
+        };
+
+        function addParticleBlock(x1, y1, w, h, params) {
+            // Make sure values are within bounds
+            x1 = max(0, x1);
+            y1 = max(0, y1);
+            w = min(w, width - x1);
+            h = min(h, height - y1);
+            var x2 = x1 + w;
+            var y2 = y1 + h;
+
+            var positions = [];
+            var x = x1;
+            var y = y1;
+            var dx = config.bondLimit;
+            var dy = dx * sqrt(3) / 2;
+            var rows = 0;
+
+            while (y < y2) {
+                positions.push([x, y]);
+                x += dx;
+                if (x > x2) {
+                    y += dy;
+                    x = x1;
+                    rows++;
+                    if (rows % 2) {
+                        x += dx * 0.5;
+                    }
+                }
+            }
+
+            _addParticles(positions, params);
+        }
 
         function draw() {
             ctx.clearRect(0, 0, width, height);
@@ -122,7 +178,35 @@ var Atomic = (function () {
         }
 
         function set(attr, value) {
-            config[attr] = value;
+            if (attr === 'binSize') {
+                _setBinSize(value);
+            } else if (attr === 'bondLimit') {
+                _setBondLimit(value);
+            } else {
+                config[attr] = value;
+            }
+        }
+
+        // Set the size for binning when calculating particle collisions
+        function _setBinSize(size) {
+            config.binSize = max(config.bondLimit, size);
+            binRows = Math.ceil(width / size);
+            binCols = Math.ceil(height / size);
+            nBins = binRows * binCols;
+        }
+
+        function _setBondLimit(size) {
+            config.bondLimit = size;
+            if (size < config.binSize) {
+                _setBinSize(size);
+            }
+        }
+
+        function _getBinnedParticles() {
+            var bins = [];
+            for (i = 0; i < nBins; i++) {
+                bins.push([]);
+            }
         }
 
         return {
@@ -130,6 +214,7 @@ var Atomic = (function () {
             draw: draw,
             particles: particles,
             addParticles: addParticles,
+            addParticleBlock: addParticleBlock,
             stop: stop,
             start: start,
             toggleRunning: toggleRunning

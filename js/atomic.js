@@ -9,7 +9,7 @@ const Atomic = (() => {
 
     class Particle {
         constructor(x, y) {
-            this.x = y;
+            this.x = x;
             this.y = y;
             this.dx = (INITIAL_SPEED * random()) * Math.cos((TAU * random()));
             this.dy = (INITIAL_SPEED * random()) * Math.cos((TAU * random()));

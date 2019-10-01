@@ -5,9 +5,12 @@ var Atomic = (function () {
     // Functions
     var random = Math.random;
 
+    // Default config
     var INITIAL_SPEED = 1;
+    var PARTICLE_FILL = 'rgb(100, 120, 200)';
+    var PARTICLE_R = 5;
 
-    function getParticle(x, y) {        
+    function getParticle(x, y, r, colour) {
         // Velocity
         var speed = INITIAL_SPEED * random();
         var angle = TAU * random();
@@ -15,8 +18,10 @@ var Atomic = (function () {
         return {
             x: x,
             y: y,
+            r: r,
             dx: speed * Math.cos(angle),
             dy: speed * Math.cos(angle),
+            colour: colour
         };
     };
 
@@ -36,17 +41,19 @@ var Atomic = (function () {
         var particles = [];
         var nParticles = 0;
 
-        // Default config
+        // World config
         var config = {
-            particleFill: 'rgb(100, 120, 200)',
-            particleR: 5,
+            particleFill: PARTICLE_FILL,
+            particleR: PARTICLE_R,
         }
 
         function addParticles(n) {
             for (var i = 0; i < n; i++) {
                 var x = width * random();
                 var y = height * random();
-                particles.push(getParticle(x, y));
+                var r = config.particleR;
+                var colour = config.particleFill;
+                particles.push(getParticle(x, y, r, colour));
             }
             nParticles += n;
         };
@@ -58,15 +65,19 @@ var Atomic = (function () {
             for (var i = 0; i < nParticles; i++) {
                 ctx.beginPath();
                 ctx.arc(particles[i].x, particles[i].y, config.particleR, 0, TAU, true);
-
                 ctx.fill();
             }
         }
 
+        function set(attr, value) {
+            config[attr] = value;
+        }
+
         return {
+            set: set,
+            draw: draw,
             particles: particles,
             addParticles: addParticles,
-            draw: draw,
         };
     }
 

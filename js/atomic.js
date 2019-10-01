@@ -1,27 +1,24 @@
-var Atomic = (function () {
+const Atomic = (() => {
     // Constants
-    var TAU = 2 * Math.PI;
+    const TAU = 2 * Math.PI;
 
     // Functions
-    var random = Math.random;
+    const random = Math.random;
 
-    var INITIAL_SPEED = 1;
+    let INITIAL_SPEED = 1;
 
-    var Particle = function(x, y) {
-        // Position
-        this.x = x;
-        this.y = y;
-        
-        // Velocity
-        var speed = INITIAL_SPEED * random();
-        var angle = TAU * random();
-        this.dx = speed * Math.cos(angle);
-        this.dy = speed * Math.sin(angle);
-    };
+    class Particle {
+        constructor(x, y) {
+            this.x = y;
+            this.y = y;
+            this.dx = (INITIAL_SPEED * random()) * Math.cos((TAU * random()));
+            this.dy = (INITIAL_SPEED * random()) * Math.cos((TAU * random()));
+        }
+    }
 
     function makeWorld(id, width, height) {
-        var parent = document.getElementById(id);
-        var canvas = document.createElement('canvas');
+        const parent = document.getElementById(id);
+        const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
         parent.appendChild(canvas);
@@ -45,4 +42,5 @@ var Atomic = (function () {
     return {
         makeWorld: makeWorld
     };
+
 })();

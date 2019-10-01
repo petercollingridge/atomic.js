@@ -7,16 +7,17 @@ var Atomic = (function () {
 
     var INITIAL_SPEED = 1;
 
-    var Particle = function(x, y) {
-        // Position
-        this.x = x;
-        this.y = y;
-        
+    function getParticle(x, y) {        
         // Velocity
         var speed = INITIAL_SPEED * random();
         var angle = TAU * random();
-        this.dx = speed * Math.cos(angle);
-        this.dy = speed * Math.sin(angle);
+
+        return {
+            x: x,
+            y: y,
+            dx: speed * Math.cos(angle),
+            dy: speed * Math.cos(angle),
+        };
     };
 
     function makeWorld(id, width, height) {
@@ -32,7 +33,7 @@ var Atomic = (function () {
             for (var i = 0; i < n; i++) {
                 var x = width * random();
                 var y = height * random();
-                particles.push(new Particle(x, y));
+                particles.push(getParticle(x, y));
             }
         };
 

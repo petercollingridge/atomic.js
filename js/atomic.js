@@ -40,6 +40,7 @@ var Atomic = (function () {
 
         var particles = [];
         var nParticles = 0;
+        var animationId;
 
         // World config
         var config = {
@@ -69,6 +70,39 @@ var Atomic = (function () {
             }
         }
 
+        function tick() {
+            for (var i = 0; i < nParticles; i++) {
+                p = particles[i];
+                p.x += p.dx;
+                p.y += p.dy;
+            }
+        }
+
+        function update() {
+            tick();
+            draw();
+            animationId = window.requestAnimationFrame(update);
+        }
+
+        function start() {
+            animationId = window.requestAnimationFrame(update);
+        }
+
+        function stop() {
+            if (animationId) {
+                window.cancelAnimationFrame(animationId);
+                animationId = false;
+            }
+        }
+
+        function toggleRunning() {
+            if (animationId) {
+                stop();
+            } else {
+                start();
+            }
+        }
+
         function set(attr, value) {
             config[attr] = value;
         }
@@ -78,6 +112,9 @@ var Atomic = (function () {
             draw: draw,
             particles: particles,
             addParticles: addParticles,
+            stop: stop,
+            start: start,
+            toggleRunning: toggleRunning
         };
     }
 

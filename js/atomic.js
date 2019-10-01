@@ -60,7 +60,7 @@ var Atomic = (function () {
         };
 
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = config.particleFill;
 
             for (var i = 0; i < nParticles; i++) {
@@ -73,8 +73,26 @@ var Atomic = (function () {
         function tick() {
             for (var i = 0; i < nParticles; i++) {
                 p = particles[i];
+
+                // Particles move
                 p.x += p.dx;
                 p.y += p.dy;
+
+                // Particles bounce
+                if (p.x < p.r) {
+                    p.x = 2 * p.r - p.x;
+                    p.dx *= -1;
+                } else if (p.x > width - p.r) {
+                    p.x = 2 * (width - p.r) - p.x;
+                    p.dx *= -1;
+                }
+                if (p.y < p.r) {
+                    p.y = 2 * p.r - p.y;
+                    p.dy *= -1;
+                } else if (p.y > height - p.r) {
+                    p.y = 2 * (height - p.r) - p.y;
+                    p.dy *= -1;
+                }
             }
         }
 

@@ -16,14 +16,15 @@ const Atomic = (() => {
         }
     }
 
-    function makeWorld(id, width, height) {
-        const parent = document.getElementById(id);
+
+    function makeWorld(selector, width, height) {
+        const parent = document.querySelector(`${selector}`);
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
         parent.appendChild(canvas);
 
-        var particles = [];
+        const particles = [];
 
         function addParticles(n) {
             for (var i = 0; i < n; i++) {

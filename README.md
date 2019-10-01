@@ -6,5 +6,6 @@ To insert a 200 by 300 pixel canvas into the DOM element with id="world"
 
 ```
 var world = Atomic.makeWorld('world', 300, 200);
-var world.draw();
+world.addParticles(20);
+world.start();
 ```

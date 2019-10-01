@@ -4,8 +4,6 @@ button1.onclick = world1.toggleRunning;
 
 world1.addParticles(20);
 world1.draw();
-world1.start();
-world1.stop();
 
 var world2 = Atomic.makeWorld('world-2', 160, 160);
 world2.set('particleR', 10);

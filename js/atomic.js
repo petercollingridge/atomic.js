@@ -232,6 +232,29 @@ var Atomic = (function () {
                             _particleInteraction(p[j], p[k]);
                         }
                     }
+
+                    // Find collisions with neighbouring bins
+            
+                    if (x < binRows - 1) {
+                        // Collide with particles in the bin to the right
+                        _interactionsBetweenBins(p, bins[i + 1]);
+                    }
+
+                    if (y < binCols - 1) {
+                        i += binRows;
+                        // Collide with particles in the bin below
+                        _interactionsBetweenBins(p, bins[i]);
+
+                        if (x > 0) {
+                            // Collide with particles in the bin below and left
+                            _interactionsBetweenBins(p, bins[i - 1]);
+                        }
+                        
+                        if (x < binRows - 1) {
+                            // Collide with particles in the bin below and right
+                            _interactionsBetweenBins(p, bins[i + 1]);
+                        }
+                    }
                 }
             }
         }
@@ -246,14 +269,27 @@ var Atomic = (function () {
             // Add each particle to a bin
             var d = 1 / config.binSize;
             for (i = 0; i < nParticles; i++) {
-                var x = Math.floor(particles[i].x * d);
-                var y = Math.floor(particles[i].y * d);
+                var x = floor(particles[i].x * d);
+                var y = floor(particles[i].y * d);
                 var b = y * binRows + x;
                 
                 bins[b].push(particles[i]);
             }
 
             return bins;
+        }
+
+        function _interactionsBetweenBins(bin1, bin2) {
+            var n = bin2.length;
+                        
+            if (n) {
+                var i, j
+                for (i = 0; i < bin1.length; i++) {
+                    for (j = 0; j < n; j++) {
+                        _particleInteraction(bin1[i], bin2[j]);
+                    }
+                }
+            }
         }
 
         function _particleInteraction(p1, p2) {

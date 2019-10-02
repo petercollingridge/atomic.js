@@ -3,16 +3,22 @@ var Atomic = (function () {
     var TAU = 2 * Math.PI;
 
     // Functions
-    var random = Math.random;
     var min = Math.min;
     var max = Math.max;
     var sqrt = Math.sqrt;
+    var floor = Math.floor;
+    var random = Math.random;
 
     // Default config
     var INITIAL_SPEED = 1;
     var PARTICLE_FILL = 'rgb(100, 120, 200)';
     var PARTICLE_R = 5;
+
     var BOND_LIMIT = 18;
+    var BOND_LENGTH = 12;
+    var BOND_DIFF = BOND_LIMIT - BOND_LENGTH;
+    var BOND_STRENGTH = 0.004;
+
     var BIN_SIZE = BOND_LIMIT;
 
     function getParticle(x, y, r, colour, speed) {
@@ -55,6 +61,34 @@ var Atomic = (function () {
             bondLimit: BOND_LIMIT,
         };
         _setBinSize(BIN_SIZE);
+        _setBondLimit(BOND_LIMIT)
+
+        function set(attr, value) {
+            if (attr === 'binSize') {
+                _setBinSize(value);
+            } else if (attr === 'bondLimit') {
+                _setBondLimit(value);
+            } else {
+                config[attr] = value;
+            }
+        }
+
+        // Set the size for binning when calculating particle collisions
+        function _setBinSize(size) {
+            config.binSize = max(config.bondLimit, size);
+            binRows = Math.ceil(width / size);
+            binCols = Math.ceil(height / size);
+            nBins = binRows * binCols;
+        }
+
+        function _setBondLimit(size) {
+            config.bondLimit = size;
+            config.bondLimitSq = size * size;
+
+            if (size < config.binSize) {
+                _setBinSize(size);
+            }
+        }
 
         function _addParticles(positions, params) {
             if (!params) { params = {}; }
@@ -115,6 +149,31 @@ var Atomic = (function () {
             _addParticles(positions, params);
         }
 
+        function start() {
+            animationId = window.requestAnimationFrame(update);
+        }
+
+        function stop() {
+            if (animationId) {
+                window.cancelAnimationFrame(animationId);
+                animationId = false;
+            }
+        }
+
+        function toggleRunning() {
+            if (animationId) {
+                stop();
+            } else {
+                start();
+            }
+        }
+
+        function update() {
+            tick();
+            draw();
+            animationId = window.requestAnimationFrame(update);
+        }
+
         function draw() {
             ctx.clearRect(0, 0, width, height);
             
@@ -128,10 +187,11 @@ var Atomic = (function () {
         }
 
         function tick() {
+            _calculateInteractions();
+
+            // Particles move
             for (var i = 0; i < nParticles; i++) {
                 p = particles[i];
-
-                // Particles move
                 p.x += p.dx;
                 p.y += p.dy;
 
@@ -153,60 +213,87 @@ var Atomic = (function () {
             }
         }
 
-        function update() {
-            tick();
-            draw();
-            animationId = window.requestAnimationFrame(update);
-        }
+        function _calculateInteractions() {
+            var bins = _getBinnedParticles();
+            var x, y, i, j, k, p, pn;
 
-        function start() {
-            animationId = window.requestAnimationFrame(update);
-        }
-
-        function stop() {
-            if (animationId) {
-                window.cancelAnimationFrame(animationId);
-                animationId = false;
-            }
-        }
-
-        function toggleRunning() {
-            if (animationId) {
-                stop();
-            } else {
-                start();
-            }
-        }
-
-        function set(attr, value) {
-            if (attr === 'binSize') {
-                _setBinSize(value);
-            } else if (attr === 'bondLimit') {
-                _setBondLimit(value);
-            } else {
-                config[attr] = value;
-            }
-        }
-
-        // Set the size for binning when calculating particle collisions
-        function _setBinSize(size) {
-            config.binSize = max(config.bondLimit, size);
-            binRows = Math.ceil(width / size);
-            binCols = Math.ceil(height / size);
-            nBins = binRows * binCols;
-        }
-
-        function _setBondLimit(size) {
-            config.bondLimit = size;
-            if (size < config.binSize) {
-                _setBinSize(size);
+            for (x = 0; x < binRows; x++) {
+                for (y = 0; y < binCols; y++) {
+                    i = x + y * binRows;
+                    p = bins[i];
+                    pn = p.length;
+                    
+                    // Empty bin, so keep moving
+                    if (!pn) { continue; }
+                    
+                    // Find collisions within this bin
+                    for (j = 0; j < pn - 1; j++) {
+                        for (k = j + 1; k < pn; k++) {
+                            _particleInteraction(p[j], p[k]);
+                        }
+                    }
+                }
             }
         }
 
         function _getBinnedParticles() {
-            var bins = [];
+            // Create 1D array of bins
+            var i, bins = [];
             for (i = 0; i < nBins; i++) {
                 bins.push([]);
+            }
+
+            // Add each particle to a bin
+            var d = 1 / config.binSize;
+            for (i = 0; i < nParticles; i++) {
+                var x = Math.floor(particles[i].x * d);
+                var y = Math.floor(particles[i].y * d);
+                var b = y * binRows + x;
+                
+                bins[b].push(particles[i]);
+            }
+
+            return bins;
+        }
+
+        function _particleInteraction(p1, p2) {
+            var dx = p2.x - p1.x;
+            if (dx > config.bondLimit) { return; }
+            
+            var dy = p2.y - p1.y;
+            if (dy > config.bondLimit) { return; }
+            
+            var d = dx * dx + dy * dy;
+
+            if (d < config.bondLimitSq) {
+                d = sqrt(d);
+                
+                var force = BOND_STRENGTH * (BOND_LENGTH - d);
+                if (d > BOND_LENGTH) {
+                    // reduce attract based on distance
+                    force *= (BOND_LIMIT - d) / BOND_DIFF;
+                }
+                
+                // Find new distance
+                var d2 = d + force * 2;
+                
+                // Find new force based on new distance
+                var force2 = BOND_STRENGTH * (BOND_LENGTH - d2);
+                if (d2 > BOND_LENGTH) {
+                    // reduce attract based on distance
+                    force2 *= (BOND_LIMIT - d2) / BOND_DIFF;
+                }
+                
+                // Take mean and divide by d to get unit vector
+                force = (force + force2) / (2 * d);
+                
+                dx *= force;
+                dy *= force;
+                
+                p1.dx -= dx;
+                p1.dy -= dy;
+                p2.dx += dx;
+                p2.dy += dy;
             }
         }
 

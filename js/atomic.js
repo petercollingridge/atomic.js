@@ -62,7 +62,7 @@ var Atomic = (function () {
             var r = params.r || config.particleR;
             var colour = params.colour || config.particleFill;
             var maxSpeed = params.speed || config.initialSpeed;
-            
+
             var n = positions.length;
             for (var i = 0; i < n; i++) {
                 var x = positions[i][0];
@@ -117,11 +117,12 @@ var Atomic = (function () {
 
         function draw() {
             ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = config.particleFill;
-
+            
             for (var i = 0; i < nParticles; i++) {
+                var p = particles[i];
+                ctx.fillStyle = p.colour;
                 ctx.beginPath();
-                ctx.arc(particles[i].x, particles[i].y, config.particleR, 0, TAU, true);
+                ctx.arc(p.x, p.y, p.r, 0, TAU, true);
                 ctx.fill();
             }
         }

@@ -11,6 +11,7 @@ var Atomic = (function () {
 
     // Default config
     var SIMULATION_SPEED = 4;
+    var GRAVITY = 0.0001
     var INITIAL_SPEED = 1;
     var PARTICLE_FILL = 'rgb(100, 120, 200)';
     var PARTICLE_R = 5;
@@ -19,8 +20,6 @@ var Atomic = (function () {
     var BOND_LENGTH = 12;
     var BOND_DIFF = BOND_LIMIT - BOND_LENGTH;
     var BOND_STRENGTH = 0.004;
-
-    var BIN_SIZE = BOND_LIMIT;
 
     function getParticle(x, y, r, colour, speed) {
         var angle = TAU * random();
@@ -60,6 +59,8 @@ var Atomic = (function () {
             particleR: PARTICLE_R,
             initialSpeed: INITIAL_SPEED,
             bondLimit: BOND_LIMIT,
+            bondLength: BOND_LENGTH,
+            gravity: GRAVITY,
             simulationSpeed: SIMULATION_SPEED,
         };
         _setBondLimit(BOND_LIMIT)
@@ -122,7 +123,7 @@ var Atomic = (function () {
             var positions = [];
             var x = x1;
             var y = y1;
-            var dx = config.bondLimit;
+            var dx = config.bondLength;
             var dy = dx * sqrt(3) / 2;
             var rows = 0;
 
@@ -187,6 +188,7 @@ var Atomic = (function () {
             // Particles move
             for (var i = 0; i < nParticles; i++) {
                 p = particles[i];
+                p.dy += config.gravity;
                 p.x += p.dx;
                 p.y += p.dy;
 

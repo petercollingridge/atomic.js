@@ -10,6 +10,7 @@ var Atomic = (function () {
     var random = Math.random;
 
     // Default config
+    var SIMULATION_SPEED = 4;
     var INITIAL_SPEED = 1;
     var PARTICLE_FILL = 'rgb(100, 120, 200)';
     var PARTICLE_R = 5;
@@ -51,7 +52,7 @@ var Atomic = (function () {
         var nParticles = 0;
         var animationId;
 
-        var binRows, binCols, nBins;
+        var binSize, binRows, binCols, nBins;
 
         // Initial world config
         var config = {
@@ -59,35 +60,28 @@ var Atomic = (function () {
             particleR: PARTICLE_R,
             initialSpeed: INITIAL_SPEED,
             bondLimit: BOND_LIMIT,
+            simulationSpeed: SIMULATION_SPEED,
         };
         _setBinSize(BIN_SIZE);
         _setBondLimit(BOND_LIMIT)
 
         function set(attr, value) {
-            if (attr === 'binSize') {
-                _setBinSize(value);
-            } else if (attr === 'bondLimit') {
+            if (attr === 'bondLimit') {
                 _setBondLimit(value);
             } else {
                 config[attr] = value;
             }
         }
 
-        // Set the size for binning when calculating particle collisions
-        function _setBinSize(size) {
-            config.binSize = max(config.bondLimit, size);
-            binRows = Math.ceil(width / size);
-            binCols = Math.ceil(height / size);
-            nBins = binRows * binCols;
-        }
-
         function _setBondLimit(size) {
             config.bondLimit = size;
             config.bondLimitSq = size * size;
-
-            if (size < config.binSize) {
-                _setBinSize(size);
-            }
+            
+            // Set bin size to bond limit length
+            binSize = max(config.bondLimit, size);
+            binRows = Math.ceil(width / size);
+            binCols = Math.ceil(height / size);
+            nBins = binRows * binCols;
         }
 
         function _addParticles(positions, params) {
@@ -169,7 +163,9 @@ var Atomic = (function () {
         }
 
         function update() {
-            tick();
+            for (var i = 0; i < config.simulationSpeed; i++) {
+                tick();
+            }
             draw();
             animationId = window.requestAnimationFrame(update);
         }

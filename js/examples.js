@@ -1,6 +1,9 @@
 var world1 = Atomic.makeWorld('world-1', 300, 200);
-var button1 = document.getElementById('world-1-button');
-button1.onclick = world1.toggleRunning;
+
+document.getElementById('world-1-button').onclick = world1.toggleRunning;
+document.getElementById('world-1-speed').onchange = function() {
+    world1.set('simulationSpeed', parseInt(this.value));
+};
 
 world1.addParticles(20);
 world1.draw();

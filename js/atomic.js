@@ -62,7 +62,6 @@ var Atomic = (function () {
             bondLimit: BOND_LIMIT,
             simulationSpeed: SIMULATION_SPEED,
         };
-        _setBinSize(BIN_SIZE);
         _setBondLimit(BOND_LIMIT)
 
         function set(attr, value) {

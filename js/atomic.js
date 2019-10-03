@@ -262,7 +262,7 @@ var Atomic = (function () {
             }
 
             // Add each particle to a bin
-            var d = 1 / config.binSize;
+            var d = 1 / binSize;
             for (i = 0; i < nParticles; i++) {
                 var x = floor(particles[i].x * d);
                 var y = floor(particles[i].y * d);

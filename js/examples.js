@@ -21,6 +21,7 @@ document.getElementById('world-2-temp').addEventListener('input',
 //  Set defaults
 world2.set('particleR', 4);
 world2.set('initialSpeed', 0.001);
+world2.set('temperature', 0);
 world2.set('particleFill', 'rgb(220, 80, 30)');
 
 // Add block of particles

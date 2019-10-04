@@ -1,46 +1,60 @@
-var world1 = Atomic.makeWorld('world-1', 300, 200);
+(function(id){
+    var width = 200;
+    var height = 200;
 
-document.getElementById('world-1-button').onclick = world1.toggleRunning;
-document.getElementById('world-1-speed').onchange = function() {
-    world1.set('simulationSpeed', parseFloat(this.value));
-};
+    var world = Atomic.makeWorld(id, width, height);
+    document.getElementById(id + '-button').onclick = world.toggleRunning;
 
-world1.addParticles(20);
-world1.draw();
+    world.set('particleR', 4);
+    world.set('temperature', 0.01);
 
-var worldWidth2 = 400;
-var worldHeight2 = 400;
-var world2 = Atomic.makeWorld('world-2', worldWidth2, worldHeight2);
-document.getElementById('world-2-button').onclick = world2.toggleRunning;
-document.getElementById('world-2-temp').addEventListener('input',
-    function() {
-        world2.set('temperature', parseFloat(this.value));
-    }
-);
+    // Add block of particles
+    world.addParticleBlock(40, height - 120, width - 80, 120, { temperature: 0.01 });
 
-//  Set defaults
-world2.set('particleR', 4);
-world2.set('initialSpeed', 0.001);
-world2.set('temperature', 0);
-world2.set('particleFill', 'rgb(220, 80, 30)');
+    world.update();
+})('solid');
 
-// Add block of particles
-world2.addParticleBlock(80, worldHeight2 - 56, 80, 60);
-world2.addParticleBlock(worldWidth2 - 160, worldHeight2 - 56, 80, 60);
+(function(id){
+    var width = 400;
+    var height = 400;
+    var world = Atomic.makeWorld(id, width, height);
 
-// Add a block of particles with different parameters
-world2.addParticleBlock(100, worldHeight2 - 106, 200, 50, { colour: 'rgb(40, 60, 200)' });
+    document.getElementById(id + '-button').onclick = world.toggleRunning;
+    document.getElementById(id + '-temp').addEventListener('input',
+        function() {
+            world.set('temperature', parseFloat(this.value));
+        }
+    );
+    
 
-world2.draw();
+    //  Set defaults
+    world.set('particleR', 4);
+    world.set('initialSpeed', 0.001);
+    world.set('temperature', 0);
+    world.set('particleFill', 'rgb(220, 80, 30)');
 
+    // Add block of particles
+    world.addParticleBlock(80, height - 56, 80, 60);
+    world.addParticleBlock(width - 160, height - 56, 80, 60);
 
-var world3 = Atomic.makeWorld('world-3', worldWidth2, worldHeight2);
-document.getElementById('world-3-button').onclick = world3.toggleRunning;
+    // Add a block of particles with different parameters
+    world.addParticleBlock(100, height - 106, 200, 50, { colour: 'rgb(40, 60, 200)' });
 
-// Add water
-world3.addParticleBlock(10, worldHeight2 - 60, 380, 60, { 'temperature': 0.25 });
+    world.draw();
+})('world-2');
 
-// Add a block of particles with different parameters
-world3.addParticleBlock(120, worldHeight2 - 128, 85, 60, { colour: 'red', 'temperature': 0.01 });
+(function(id){
+    var width = 400;
+    var height = 400;
 
-world3.draw();
+    var world = Atomic.makeWorld(id, width, height);
+    document.getElementById(id + '-button').onclick = world.toggleRunning;
+
+    // Add water
+    world.addParticleBlock(10, height - 60, 380, 60, { 'temperature': 0.25 });
+
+    // Add a block of particles with different parameters
+    world.addParticleBlock(120, height - 128, 85, 60, { colour: 'red', 'temperature': 0.01 });
+
+    world.draw();
+})('world-3');

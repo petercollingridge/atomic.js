@@ -369,6 +369,7 @@ var Atomic = (function () {
         return {
             set: set,
             draw: draw,
+            update: update,
             particles: particles,
             addParticles: addParticles,
             addParticleBlock: addParticleBlock,

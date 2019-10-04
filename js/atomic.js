@@ -50,6 +50,8 @@ var Atomic = (function () {
         parent.appendChild(canvas);
 
         var particles = [];
+        var edges = [];
+        var findEdges;
         var nParticles = 0;
         var animationId;
 
@@ -65,6 +67,8 @@ var Atomic = (function () {
             gravity: GRAVITY,
             temperature: TEMPERATURE,
             simulationSpeed: SIMULATION_SPEED,
+            drawEdges: true,
+            edgeColour: '#888',
         };
         _setBondLimit(BOND_LIMIT)
 
@@ -166,7 +170,15 @@ var Atomic = (function () {
         }
 
         function update() {
-            for (var i = 0; i < config.simulationSpeed; i++) {
+            edges = [];
+            findEdges = false;
+
+            var count = config.simulationSpeed;
+            while (count-- > 0) {
+                // In the final update find which particles interact
+                if (count === 0) {
+                    findEdges = true;
+                }
                 tick();
             }
             draw();
@@ -176,6 +188,18 @@ var Atomic = (function () {
         function draw() {
             ctx.clearRect(0, 0, width, height);
             
+            if (config.drawEdges) {
+                ctx.strokeStyle = config.edgeColour;
+                for (var i = 0; i < edges.length; i++) {
+                    var p1 = edges[i][0];
+                    var p2 = edges[i][1];
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            }
+
             for (var i = 0; i < nParticles; i++) {
                 var p = particles[i];
                 ctx.fillStyle = p.colour;
@@ -335,6 +359,10 @@ var Atomic = (function () {
                 p1.dy -= dy;
                 p2.dx += dx;
                 p2.dy += dy;
+
+                if (findEdges && d < config.bondLength + 1) {
+                    edges.push([p1, p2]);
+                }
             }
         }
 

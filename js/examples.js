@@ -1,18 +1,25 @@
-(function(id){
-    var width = 200;
-    var height = 200;
+function statesOfMatterExamples(id, temperature) {
+    var width = 240;
+    var height = 240;
 
     var world = Atomic.makeWorld(id, width, height);
     document.getElementById(id + '-button').onclick = world.toggleRunning;
 
-    world.set('particleR', 4);
-    world.set('temperature', 0.01);
+    world.set('simulationSpeed', 6);
+    world.set('particleR', 3.5);
+    world.set('temperature', temperature);
 
     // Add block of particles
-    world.addParticleBlock(40, height - 120, width - 80, 120, { temperature: 0.01 });
+    world.addParticleBlock(width * 0.25, height - 120, width * 0.25 - 4, 120, { temperature: temperature });
+    world.addParticleBlock(width * 0.5, height - 120, width * 0.25, 120, { temperature: temperature, colour: 'red' });
 
-    world.update();
-})('solid');
+    world.initialDraw();
+}
+
+statesOfMatterExamples('solid', 0.01);
+statesOfMatterExamples('liquid', 0.2);
+statesOfMatterExamples('gas', 0.5);
+
 
 (function(id){
     var width = 400;

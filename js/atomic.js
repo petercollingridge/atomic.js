@@ -151,7 +151,8 @@ var Atomic = (function () {
         }
 
         function start() {
-            animationId = window.requestAnimationFrame(update);
+            update();
+            animationId = window.requestAnimationFrame(start);
         }
 
         function stop() {
@@ -182,7 +183,6 @@ var Atomic = (function () {
                 tick();
             }
             draw();
-            animationId = window.requestAnimationFrame(update);
         }
 
         function draw() {
@@ -207,6 +207,14 @@ var Atomic = (function () {
                 ctx.arc(p.x, p.y, p.r, 0, TAU, true);
                 ctx.fill();
             }
+        }
+
+        function initialDraw() {
+            // Find edges and draw but don't move anything
+            edges = [];
+            findEdges = true;
+            _calculateInteractions();
+            draw();
         }
 
         function tick() {
@@ -370,6 +378,7 @@ var Atomic = (function () {
             set: set,
             draw: draw,
             update: update,
+            initialDraw: initialDraw,
             particles: particles,
             addParticles: addParticles,
             addParticleBlock: addParticleBlock,

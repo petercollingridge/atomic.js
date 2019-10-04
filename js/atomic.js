@@ -13,13 +13,15 @@ var Atomic = (function () {
     var SIMULATION_SPEED = 4;
     var GRAVITY = 0.0001
     var INITIAL_SPEED = 1;
+    var TEMPERATURE = 0.2;
+
     var PARTICLE_FILL = 'rgb(100, 120, 200)';
     var PARTICLE_R = 5;
 
     var BOND_LIMIT = 18;
     var BOND_LENGTH = 12;
     var BOND_DIFF = BOND_LIMIT - BOND_LENGTH;
-    var BOND_STRENGTH = 0.004;
+    var BOND_STRENGTH = 0.003;
 
     function getParticle(x, y, r, colour, speed) {
         var angle = TAU * random();
@@ -61,6 +63,7 @@ var Atomic = (function () {
             bondLimit: BOND_LIMIT,
             bondLength: BOND_LENGTH,
             gravity: GRAVITY,
+            temperature: TEMPERATURE,
             simulationSpeed: SIMULATION_SPEED,
         };
         _setBondLimit(BOND_LIMIT)
@@ -89,7 +92,7 @@ var Atomic = (function () {
             
             var r = params.r || config.particleR;
             var colour = params.colour || config.particleFill;
-            var maxSpeed = params.speed || config.initialSpeed;
+            var maxSpeed = params.temperature || config.initialSpeed;
 
             var n = positions.length;
             for (var i = 0; i < n; i++) {
@@ -195,19 +198,24 @@ var Atomic = (function () {
                 // Particles bounce
                 if (p.x < p.r) {
                     p.x = 2 * p.r - p.x;
-                    p.dx *= -1;
+                    p.dx *= _getEnergyExchangedWithWall(p);
                 } else if (p.x > width - p.r) {
                     p.x = 2 * (width - p.r) - p.x;
-                    p.dx *= -1;
+                    p.dx *= _getEnergyExchangedWithWall(p);
                 }
                 if (p.y < p.r) {
                     p.y = 2 * p.r - p.y;
-                    p.dy *= -1;
+                    p.dy *= _getEnergyExchangedWithWall(p);
                 } else if (p.y > height - p.r) {
                     p.y = 2 * (height - p.r) - p.y;
-                    p.dy *= -1;
+                    p.dy *= _getEnergyExchangedWithWall(p);
                 }
             }
+        }
+
+        function _getEnergyExchangedWithWall(p) {
+            var temp = sqrt(p.dx * p.dx + p.dy * p.dy);
+            return -(temp + config.temperature) / (2 * temp);
         }
 
         function _calculateInteractions() {

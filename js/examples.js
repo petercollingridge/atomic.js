@@ -1,6 +1,6 @@
 function statesOfMatterExamples(id, temperature) {
-    var width = 240;
-    var height = 240;
+    var width = 330;
+    var height = 330;
 
     var world = Atomic.makeWorld(id, width, height);
     document.getElementById(id + '-button').onclick = world.toggleRunning;
@@ -10,14 +10,14 @@ function statesOfMatterExamples(id, temperature) {
     world.set('temperature', temperature);
 
     // Add block of particles
-    world.addParticleBlock(width * 0.25, height - 120, width * 0.25 - 4, 120, { temperature: temperature });
-    world.addParticleBlock(width * 0.5, height - 120, width * 0.25, 120, { temperature: temperature, colour: 'red' });
+    world.addParticleBlock(width * 0.25, height - 150, width * 0.25 - 4, 150, { temperature: temperature });
+    world.addParticleBlock(width * 0.5, height - 150, width * 0.25, 150, { temperature: temperature, colour: '#d32' });
 
     world.initialDraw();
 }
 
-statesOfMatterExamples('solid', 0.01);
-statesOfMatterExamples('liquid', 0.2);
+statesOfMatterExamples('solid', 0.02);
+statesOfMatterExamples('liquid', 0.18);
 statesOfMatterExamples('gas', 0.5);
 
 

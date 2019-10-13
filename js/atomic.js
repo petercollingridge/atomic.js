@@ -50,10 +50,11 @@ var Atomic = (function () {
         parent.appendChild(canvas);
 
         var particles = [];
+        var savedParticles = [];
         var edges = [];
         var findEdges;
         var nParticles = 0;
-        var animationId;
+        var animationId = false;
 
         var binSize, binRows, binCols, nBins;
 
@@ -168,6 +169,34 @@ var Atomic = (function () {
             } else {
                 start();
             }
+        }
+
+        function isRunning() {
+            return animationId !== false;
+        }
+
+        function copyParticles(particleArray) {
+            var copy = [];
+            for (var i = 0; i < nParticles; i++) {
+                var particle = particleArray[i];
+                var particleCopy = {};
+
+                for (var attr in particle) {
+                    particleCopy[attr] = particle[attr];
+                }
+
+                copy.push(particleCopy);
+            }
+            return copy;
+        }
+
+        function saveState() {
+            savedParticles = copyParticles(particles);
+        }
+
+        function restoreState() {
+            particles = copyParticles(savedParticles);
+            initialDraw();
         }
 
         function update() {
@@ -384,6 +413,9 @@ var Atomic = (function () {
             addParticleBlock: addParticleBlock,
             stop: stop,
             start: start,
+            save: saveState,
+            restart: restoreState,
+            isRunning: isRunning,
             toggleRunning: toggleRunning
         };
     }

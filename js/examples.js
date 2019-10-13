@@ -3,7 +3,6 @@ function statesOfMatterExamples(id, temperature) {
     var height = 330;
 
     var world = Atomic.makeWorld(id, width, height);
-    document.getElementById(id + '-button').onclick = world.toggleRunning;
 
     world.set('simulationSpeed', 6);
     world.set('particleR', 3.5);
@@ -12,6 +11,20 @@ function statesOfMatterExamples(id, temperature) {
     // Add block of particles
     world.addParticleBlock(width * 0.25, height - 150, width * 0.25 - 4, 150, { temperature: temperature });
     world.addParticleBlock(width * 0.5, height - 150, width * 0.25, 150, { temperature: temperature, colour: '#d32' });
+
+    // Add play pause button
+    document.getElementById(id + '-button').onclick = function() {
+        world.toggleRunning();
+        if (world.isRunning()) {
+            this.innerHTML = 'Pause';
+        } else {
+            this.innerHTML = 'Play';
+        }
+    };
+
+    // Add restart button
+    world.save();
+    document.getElementById(id + '-restart-button').onclick = world.restart;
 
     world.initialDraw();
 }

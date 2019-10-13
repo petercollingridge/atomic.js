@@ -171,6 +171,17 @@ var Atomic = (function () {
             }
         }
 
+        function addPlayPauseButton(id) {
+            document.getElementById(id).onclick = function() {
+                toggleRunning();
+                if (isRunning()) {
+                    this.innerHTML = 'Pause';
+                } else {
+                    this.innerHTML = 'Play';
+                }
+            };
+        }
+
         function isRunning() {
             return animationId !== false;
         }
@@ -416,7 +427,8 @@ var Atomic = (function () {
             save: saveState,
             restart: restoreState,
             isRunning: isRunning,
-            toggleRunning: toggleRunning
+            toggleRunning: toggleRunning,
+            addPlayPauseButton: addPlayPauseButton
         };
     }
 

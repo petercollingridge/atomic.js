@@ -13,14 +13,7 @@ function statesOfMatterExamples(id, temperature) {
     world.addParticleBlock(width * 0.5, height - 150, width * 0.25, 150, { temperature: temperature, colour: '#d32' });
 
     // Add play pause button
-    document.getElementById(id + '-button').onclick = function() {
-        world.toggleRunning();
-        if (world.isRunning()) {
-            this.innerHTML = 'Pause';
-        } else {
-            this.innerHTML = 'Play';
-        }
-    };
+    world.addPlayPauseButton(id + '-button');
 
     // Add restart button
     world.save();

@@ -57,6 +57,7 @@ var Atomic = (function () {
         var animationId = false;
 
         var binSize, binRows, binCols, nBins;
+        var bondDiff, bondLimitSq;
 
         // Initial world config
         var config = {
@@ -65,6 +66,7 @@ var Atomic = (function () {
             initialSpeed: INITIAL_SPEED,
             bondLimit: BOND_LIMIT,
             bondLength: BOND_LENGTH,
+            bondStrength: BOND_STRENGTH,
             gravity: GRAVITY,
             temperature: TEMPERATURE,
             simulationSpeed: SIMULATION_SPEED,
@@ -81,9 +83,21 @@ var Atomic = (function () {
             }
         }
 
+        function scale(scaleAmount) {
+            // Increase or reduce the size of the simulation
+            config.bondLength *= scaleAmount;
+            _setBondLimit(scaleAmount * config.bondLimit);
+            config.particleR *= scaleAmount;
+            config.initialSpeed *= scaleAmount;
+            // config.bondStrength *= scaleAmount;
+            config.gravity *= scaleAmount;
+            config.temperature *= scaleAmount;
+        }
+
         function _setBondLimit(size) {
             config.bondLimit = size;
-            config.bondLimitSq = size * size;
+            bondLimitSq = size * size;
+            bondDiff = config.bondLimit - config.bondLength;
             
             // Set bin size to bond limit length
             binSize = max(config.bondLimit, size);
@@ -378,23 +392,23 @@ var Atomic = (function () {
             
             var d = dx * dx + dy * dy;
 
-            if (d < config.bondLimitSq) {
+            if (d < bondLimitSq) {
                 d = sqrt(d);
                 
-                var force = BOND_STRENGTH * (BOND_LENGTH - d);
-                if (d > BOND_LENGTH) {
+                var force = config.bondStrength * (config.bondLength - d);
+                if (d > config.bondLength) {
                     // reduce attract based on distance
-                    force *= (BOND_LIMIT - d) / BOND_DIFF;
+                    force *= (config.bondLimit - d) / bondDiff;
                 }
                 
                 // Find new distance
                 var d2 = d + force * 2;
                 
                 // Find new force based on new distance
-                var force2 = BOND_STRENGTH * (BOND_LENGTH - d2);
-                if (d2 > BOND_LENGTH) {
+                var force2 = config.bondStrength * (config.bondLength - d2);
+                if (d2 > config.bondLength) {
                     // reduce attract based on distance
-                    force2 *= (BOND_LIMIT - d2) / BOND_DIFF;
+                    force2 *= (config.bondLimit - d2) / bondDiff;
                 }
                 
                 // Take mean and divide by d to get unit vector
@@ -417,6 +431,7 @@ var Atomic = (function () {
         return {
             set: set,
             draw: draw,
+            scale: scale,
             update: update,
             initialDraw: initialDraw,
             particles: particles,

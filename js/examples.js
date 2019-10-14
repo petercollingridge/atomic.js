@@ -71,3 +71,20 @@ statesOfMatterExamples('gas', 0.5);
 
     world.draw();
 })('world-3');
+
+(function(id){
+    var width = 400;
+    var height = 400;
+
+    var world = Atomic.makeWorld(id, width, height);
+    world.scale(0.5);
+    document.getElementById(id + '-button').onclick = world.toggleRunning;
+
+    // Add water
+    world.addParticleBlock(10, height - 60, 380, 60, { 'temperature': 0.25 });
+
+    // Add a block of particles with different parameters
+    world.addParticleBlock(120, height - 128, 85, 60, { colour: 'red', 'temperature': 0.01 });
+
+    world.draw();
+})('world-4');

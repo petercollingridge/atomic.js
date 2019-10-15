@@ -9,8 +9,8 @@ function statesOfMatterExamples(id, temperature) {
     world.set('temperature', temperature);
 
     // Add block of particles
-    world.addParticleBlock(width * 0.25, height - 150, width * 0.25 - 4, 150, { temperature: temperature });
-    world.addParticleBlock(width * 0.5, height - 150, width * 0.25, 150, { temperature: temperature, colour: '#d32' });
+    world.addParticleBlock(width * 0.25, 1, width * 0.25 - 4, 150, { temperature: temperature });
+    world.addParticleBlock(width * 0.5, 1, width * 0.25, 150, { temperature: temperature, colour: '#d32' });
 
     // Add play pause button
     world.addPlayPauseButton(id + '-button');
@@ -25,7 +25,6 @@ function statesOfMatterExamples(id, temperature) {
 statesOfMatterExamples('solid', 0.02);
 statesOfMatterExamples('liquid', 0.18);
 statesOfMatterExamples('gas', 0.5);
-
 
 (function(id){
     var width = 400;
@@ -47,11 +46,11 @@ statesOfMatterExamples('gas', 0.5);
     world.set('particleFill', 'rgb(220, 80, 30)');
 
     // Add block of particles
-    world.addParticleBlock(80, height - 56, 80, 60);
-    world.addParticleBlock(width - 160, height - 56, 80, 60);
+    world.addParticleBlock(80, 0, 80, 60);
+    world.addParticleBlock(width - 160, 0, 80, 60);
 
     // Add a block of particles with different parameters
-    world.addParticleBlock(100, height - 106, 200, 50, { colour: 'rgb(40, 60, 200)' });
+    world.addParticleBlock(100, 60, 200, 60, { colour: 'rgb(40, 60, 200)' });
 
     world.draw();
 })('world-2');
@@ -64,10 +63,10 @@ statesOfMatterExamples('gas', 0.5);
     document.getElementById(id + '-button').onclick = world.toggleRunning;
 
     // Add water
-    world.addParticleBlock(10, height - 60, 380, 60, { 'temperature': 0.25 });
+    world.addParticleBlock(10, 0, 380, 60, { 'temperature': 0.25 });
 
     // Add a block of particles with different parameters
-    world.addParticleBlock(120, height - 128, 85, 60, { colour: 'red', 'temperature': 0.01 });
+    world.addParticleBlock(120, 60, 85, 60, { colour: 'red', 'temperature': 0.01 });
 
     world.draw();
 })('world-3');
@@ -81,10 +80,27 @@ statesOfMatterExamples('gas', 0.5);
     document.getElementById(id + '-button').onclick = world.toggleRunning;
 
     // Add water
-    world.addParticleBlock(10, height - 60, 380, 60, { 'temperature': 0.25 });
+    world.addParticleBlock(10, 0, 380, 60, { 'temperature': 0.125 });
 
     // Add a block of particles with different parameters
-    world.addParticleBlock(120, height - 128, 85, 60, { colour: 'red', 'temperature': 0.01 });
+    world.addParticleBlock(120, 60, 85, 60, { colour: 'red', 'temperature': 0.005 });
 
     world.draw();
 })('world-4');
+
+(function(id){
+    var width = 200;
+    var height = 400;
+
+    var world = Atomic.makeWorld(id, width, height);
+    world.scale(0.8);
+    world.addPlayPauseButton(id + '-button');
+
+    // Add water
+    world.addParticleBlock(5, 0, width - 10, height, { 'temperature': 0.125 });
+
+    // Add a block of particles with different parameters
+    // world.addParticleBlock(120, height - 128, 85, 60, { colour: 'red', 'temperature': 0.005 });
+
+    world.draw();
+})('diffusion-1');

@@ -134,13 +134,15 @@ var Atomic = (function () {
         };
 
         function addParticleBlock(x1, y1, w, h, params) {
+            if (!params) { params = {}; }
+            var r = params.r || config.particleR;
             // Make sure values are within bounds
             x1 = max(0, x1);
-            y1 = max(0, y1);
+            y1 = height - max(0, y1) - r;
             w = min(w, width - x1);
-            h = min(h, height - y1);
+            h = max(0, h);
             var x2 = x1 + w;
-            var y2 = y1 + h;
+            var y2 = y1 - h + r;
 
             var positions = [];
             var x = x1;
@@ -149,11 +151,11 @@ var Atomic = (function () {
             var dy = dx * sqrt(3) / 2;
             var rows = 0;
 
-            while (y < y2) {
+            while (y > y2) {
                 positions.push([x, y]);
                 x += dx;
                 if (x > x2) {
-                    y += dy;
+                    y -= dy;
                     x = x1;
                     rows++;
                     if (rows % 2) {

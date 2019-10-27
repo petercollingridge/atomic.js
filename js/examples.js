@@ -91,16 +91,35 @@ statesOfMatterExamples('gas', 0.5);
 (function(id){
     var width = 200;
     var height = 400;
+    var temperature = 0.12;
 
     var world = Atomic.makeWorld(id, width, height);
-    world.scale(0.8);
+    // world.scale(0.8);
+    world.set('gravity', 0);
+    world.set('temperature', temperature);
     world.addPlayPauseButton(id + '-button');
 
     // Add water
-    world.addParticleBlock(5, 0, width - 10, height, { 'temperature': 0.125 });
-
-    // Add a block of particles with different parameters
-    // world.addParticleBlock(120, height - 128, 85, 60, { colour: 'red', 'temperature': 0.005 });
+    world.addParticleBlock(5, 0, width - 10, height - 40, { 'temperature': temperature });
+    world.addParticleBlock(5, height - 36, width - 10, 36, { 'temperature': temperature, colour: 'red' });
 
     world.draw();
 })('diffusion-1');
+
+(function(id){
+    var width = 200;
+    var height = 400;
+    var temperature = 0.2;
+
+    var world = Atomic.makeWorld(id, width, height);
+    // world.scale(0.8);
+    world.set('gravity', 0);
+    world.set('temperature', temperature);
+    world.addPlayPauseButton(id + '-button');
+
+    // Add water
+    world.addParticleBlock(5, 0, width - 10, height - 40, { 'temperature': temperature });
+    world.addParticleBlock(5, height - 36, width - 10, 36, { 'temperature': temperature, colour: 'red' });
+
+    world.draw();
+})('diffusion-2');

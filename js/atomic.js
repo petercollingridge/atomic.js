@@ -20,7 +20,6 @@ var Atomic = (function () {
 
     var BOND_LIMIT = 18;
     var BOND_LENGTH = 12;
-    var BOND_DIFF = BOND_LIMIT - BOND_LENGTH;
     var BOND_STRENGTH = 0.003;
 
     function getParticle(x, y, r, colour, speed) {
@@ -133,16 +132,17 @@ var Atomic = (function () {
             _addParticles(positions, params);
         };
 
-        function addParticleBlock(x1, y1, w, h, params) {
+        function addOrderedBlock(x1, y1, w, h, params) {
             if (!params) { params = {}; }
             var r = params.r || config.particleR;
+
             // Make sure values are within bounds
             x1 = max(0, x1);
             y1 = height - max(0, y1) - r;
-            w = min(w, width - x1);
+            w = max(0, w);
             h = max(0, h);
-            var x2 = x1 + w;
-            var y2 = y1 - h + r;
+            var x2 = min(width - r, x1 + w);
+            var y2 = max(0, y1 - h + r);
 
             var positions = [];
             var x = x1;
@@ -161,6 +161,88 @@ var Atomic = (function () {
                     if (rows % 2) {
                         x += dx * 0.5;
                     }
+                }
+            }
+
+            _addParticles(positions, params);
+        }
+
+        function addDisorderedBlock(x1, y1, w, h, density, params) {
+            if (!density) {
+                density = 1;
+            } else if (density <= 0) {
+                return;
+            } else if (density > 2) {
+                density = 2;
+            } else if (isNaN(density)) {
+                throw new Error('Density must be a number');
+            }
+
+            if (!params) { params = {}; }
+            var r = params.r || config.particleR;
+
+            // Make sure values are within bounds
+            x1 = max(0, x1);
+            y1 = height - max(0, y1) - r;
+            w = max(0, w);
+            h = max(0, h);
+            var x2 = min(width - r, x1 + w);
+            var y2 = max(0, y1 - h + r);
+
+            // How many points we try before rejecting a point
+            var k = 30;
+
+            // Use min dist of two thirds bond length of average distance equals bond length
+            var minDist = config.bondLength * 2 / 3 * density;
+            var minDist2 = minDist * minDist;
+
+            var positions = [];
+            var activePoints = [];
+
+            // Start at a random point near the center
+            var x = x1 + (0.4 + random() * 0.2) * w;
+            var y = y2 + (0.4 + random() * 0.2) * h;
+            positions.push([x, y]);
+            activePoints.push([x, y]);
+
+            var i, j, activeIndex, currentPoint, pointAdded, angle, collision;
+            while (activePoints.length) {
+                // Pick a random active point
+                activeIndex = floor(random() * activePoints.length);
+                currentPoint = activePoints[activeIndex];
+                pointAdded = false;
+
+                for (i = 0; i < k; i++) {
+                    angle = random() * TAU;
+                    d = minDist + random() * minDist;
+                    x = currentPoint[0] + Math.cos(angle) * d;
+                    y = currentPoint[1] + Math.sin(angle) * d;
+                    
+                    if (x < x1 || x > x2 || y < y2 || y > y1) {
+                        continue;
+                    }
+
+                    // Check distance from each other point is > minDist
+                    collision = false;
+                    for (j = positions.length; j--;) {
+                        p = positions[j];
+                        if ((x - p[0]) * (x - p[0]) + (y - p[1]) * (y - p[1]) < minDist2) {
+                            collision = true;
+                            break;
+                        }
+                    }
+
+                    if (!collision) {
+                        positions.push([x, y]);
+                        activePoints.push([x, y]);
+                        pointAdded = true;
+                        break;
+                    }
+                }
+
+                // Failed to add point so remove it from the active list
+                if (!pointAdded) {
+                    activePoints.splice(activeIndex, 1);
                 }
             }
 
@@ -438,7 +520,8 @@ var Atomic = (function () {
             initialDraw: initialDraw,
             particles: particles,
             addParticles: addParticles,
-            addParticleBlock: addParticleBlock,
+            addOrderedBlock: addOrderedBlock,
+            addDisorderedBlock: addDisorderedBlock, 
             stop: stop,
             start: start,
             save: saveState,
